@@ -12,6 +12,7 @@ import json
 import datetime as dt
 import time
 import copy
+import threading
 
 from flask import Flask, jsonify, request, Response
 
@@ -19,7 +20,7 @@ import powerflex as pf
 import sonnen as sb
 import egauge as eg
 import shelly as sp
-from data import Data
+from data import Data, fields
 import collector as co
 from device import *
 
@@ -216,42 +217,14 @@ def _after_request(response: Response) -> Response:
 
 @_app.route("/")
 def api_root():
-    """API Information
+    """Get interfaces and device list
     ---
     responses:
         200:
-            description: TODO
+            description: List of available interfaces and devices
             content: application/json
     """
     return jsonify({"interfaces" : status, "devices" : devices})
-
-@_app.route("/docs")
-def api_docs():
-    """API Documentation
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    result = __doc__
-    for item,value in globals().items():
-        if not item.startswith("_") and callable(value) and hasattr(value,"__doc__"):
-            if type(getattr(value,"__doc__")) is str:
-                result += "\n" + getattr(value,"__doc__").strip() + "\n"
-
-    return result
-
-@_app.route("/data")
-def api_data():
-    """Get data model
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify(Data.fields)
 
 @_app.route("/stop")
 def api_stop():
@@ -262,7 +235,11 @@ def api_stop():
             description: TODO
             content: application/json
     """
-    return jsonify(sp.all_stop())
+    try:
+        Device.all_stop()
+        return jsonify(dict(status="OK"))
+    except Exception as err:
+        return _error(err)
 
 @_app.route("/powerflex")
 def api_powerflex():
@@ -516,10 +493,63 @@ def api_waterheaters():
     return jsonify([])    
 
 #
+# Device control
+#
+
+def _get_lock():
+    lock = threading.Event()
+    return lock
+
+device_commands = {
+    "test" : {"lock":_get_lock(),"data":None},
+}
+
+@_app.route("/receive/<name>")
+def api_receive(name):
+    """Receive device command
+    ---
+    responses:
+        200:
+            description: Device command
+            content: application/json
+    """
+    if not name in device_commands:
+        return _error("device not found")
+    else:
+        command = device_commands[name]
+        command["lock"].wait()
+        device_commands[name]["lock"]
+        response = command["data"]
+        command["lock"].clear()
+        command["data"] = None
+        return jsonify(response)
+
+@_app.route("/send/<name>",methods=["GET","PUT","POST"])
+def api_send(name):
+    """Send device command
+    ---
+    responses:
+        200:
+            description: Device command
+            content: application/json
+    """
+    if not name in device_commands:
+        return _error("device not found")
+    else:
+        data = {}
+        for field in fields:
+            value = request.args.get(field)
+            if value:
+                data[field] = request.args.get(field)
+        command = device_commands[name]
+        command["data"] = data
+        command["lock"].set()
+        return jsonify(dict(status="OK"))
+
+#
 # Swagger API Spec
 #
 
-from marshmallow import Schema, fields
 from flask_swagger import swagger
 
 @_app.route("/spec")

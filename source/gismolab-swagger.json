@@ -7,35 +7,11 @@
     "paths": {
         "/": {
             "get": {
-                "summary": "API Information",
+                "summary": "Get interfaces and device list",
                 "description": "",
                 "responses": {
                     "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/docs": {
-            "get": {
-                "summary": "API Documentation",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/data": {
-            "get": {
-                "summary": "Get data model",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
+                        "description": "List of available interfaces and devices",
                         "content": "application/json"
                     }
                 }
@@ -256,6 +232,50 @@
                         "schema": {
                             "type": "list"
                         }
+                    }
+                }
+            }
+        },
+        "/receive/{name}": {
+            "get": {
+                "summary": "Receive device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                }
+            }
+        },
+        "/send/{name}": {
+            "post": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
                     }
                 }
             }

@@ -34,6 +34,11 @@ class Device:
 		if self.poll_thread:
 			self.poll_thread._stop()
 
+	@classmethod
+	def all_stop(cls):
+		# TODO
+		return None
+
 	def scan_network(self,*args,**kwargs):
 		"""Scan network for devices
 
