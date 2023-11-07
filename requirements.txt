@@ -1,0 +1,12 @@
+pandas
+flask
+marimo
+requests
+xmltodict
+AWSIoTPythonSDK
+aiohttp
+netifaces
+plotly
+flask-swagger
+marshmallow
+pyopenssl
