@@ -14,7 +14,7 @@ host = "127.0.0.1"
 cache_expire = 60
 
 # Enable HTTPS
-ssl_context = 'adhoc' # None for HTTP only
+ssl_context = None # 'adhoc' # None for HTTP only
 
 # Enable CORS
-enable_cors = False # Use True to enforce CORS check
+enable_cors = True # Use True to enforce CORS check

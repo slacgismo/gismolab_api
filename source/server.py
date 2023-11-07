@@ -218,10 +218,10 @@ def _after_request(response: Response) -> Response:
 def api_root():
     """API Information
     ---
-    get:
-        description: API Specifications
-        responses:
-            200:
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify({"interfaces" : status, "devices" : devices})
 
@@ -229,10 +229,10 @@ def api_root():
 def api_docs():
     """API Documentation
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     result = __doc__
     for item,value in globals().items():
@@ -246,10 +246,10 @@ def api_docs():
 def api_data():
     """Get data model
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify(Data.fields)
 
@@ -257,10 +257,10 @@ def api_data():
 def api_stop():
     """Emergency stop
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify(sp.all_stop())
 
@@ -268,10 +268,10 @@ def api_stop():
 def api_powerflex():
     """Get powerflex status
     ---
-    get:
-        responses:
-            200:
-                content: application/json
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify(status["powerflex"])
 
@@ -280,12 +280,10 @@ def api_powerflex_json(orient):
     """Get powerflex historical data
     See pandas.DataFrame.to_json() for valid values of <orient>
     ---
-    get:
-        responses:
-            '200':
-                description: API Specifications
-                content:
-                    application/json:                                                     
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     try:
         curr_time = int(request.args.get("time"))
@@ -312,10 +310,10 @@ def api_powerflex_csv():
     """Get powerflex historical data
     See pandas.DataFrame.to_csv() for details
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     try:
         curr_time = int(request.args.get("time"))
@@ -342,18 +340,17 @@ def api_evchargers():
     """Get EV charger device list
     Returns a list of available EV charger devices.
     ---
-    get:
-        responses:
-            '200':
-                description: list of EV charger names
-                content:
-                    application/json:
-                        schema:
-                            type: array
-                            items:
-                                type: string
-            default:
-                description: Unexpected error
+    responses:
+        '200':
+            description: list of EV charger names
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: string
+        default:
+            description: Unexpected error
     """
     return jsonify([])
 
@@ -361,10 +358,10 @@ def api_evchargers():
 def api_sonnen():
     """Get Sonnen battery device list
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify(_sonnen_update())
 
@@ -372,10 +369,10 @@ def api_sonnen():
 def api_batterys(): # apologys to the English language police but API conventions demand this plural form
     """Get batteries device list
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify([])
     
@@ -383,10 +380,10 @@ def api_batterys(): # apologys to the English language police but API convention
 def api_egauge():
     """Get Egauge metering status
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify(_egauge_update())
 
@@ -394,10 +391,10 @@ def api_egauge():
 def api_meters():
     """Get meter device list
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify([])
     
@@ -405,10 +402,10 @@ def api_meters():
 def api_shelly():
     """Get Shelly switch device list
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify(sp.get_data())
 
@@ -416,10 +413,10 @@ def api_shelly():
 def api_shelly_scan():
     """Get Shelly switch status
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     try:
         network = request.args.get("network").split(',')
@@ -437,10 +434,10 @@ def api_shelly_scan():
 def api_plugs():
     """Get plug device list
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     result = sp.get_data()
     if "error" in result:
@@ -453,10 +450,10 @@ def api_plugs():
 def api_plug_name(name):
     """Get plug device
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     data = _shelly_update()[name]
     fmt = request.args.get("format")
@@ -474,10 +471,10 @@ def api_plug_name(name):
 def api_plug_name_on(name):
     """Turn plug device on
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """    
     old = sp.set_switch(name,True)
     return jsonify(old)
@@ -486,10 +483,10 @@ def api_plug_name_on(name):
 def api_plug_name_off(name):
     """Turn plug device off
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     old = sp.set_switch(name,False)
     return jsonify(old)
@@ -498,10 +495,10 @@ def api_plug_name_off(name):
 def api_hvacs():
     """Get list of HVAC devices
     ---
-    get:
-        responses:
-            200:
-                description: API Specifications
+    responses:
+        200:
+            description: TODO
+            content: application/json
     """
     return jsonify([])
     

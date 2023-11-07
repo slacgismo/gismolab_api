@@ -9,133 +9,240 @@
             "get": {
                 "summary": "API Information",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/docs": {
             "get": {
                 "summary": "API Documentation",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/data": {
             "get": {
                 "summary": "Get data model",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/stop": {
             "get": {
                 "summary": "Emergency stop",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/powerflex": {
             "get": {
                 "summary": "Get powerflex status",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/powerflex/json/{orient}": {
             "get": {
                 "summary": "Get powerflex historical data",
                 "description": "See pandas.DataFrame.to_json() for valid values of <orient>",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/powerflex/csv": {
             "get": {
                 "summary": "Get powerflex historical data",
                 "description": "See pandas.DataFrame.to_csv() for details",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/evchargers": {
             "get": {
                 "summary": "Get EV charger device list",
                 "description": "Returns a list of available EV charger devices.",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "list of EV charger names",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
             }
         },
         "/sonnen": {
             "get": {
                 "summary": "Get Sonnen battery device list",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/batterys": {
             "get": {
                 "summary": "Get batteries device list",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/egauge": {
             "get": {
                 "summary": "Get Egauge metering status",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/meters": {
             "get": {
                 "summary": "Get meter device list",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/shelly": {
             "get": {
                 "summary": "Get Shelly switch device list",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/shelly/scan": {
             "get": {
                 "summary": "Get Shelly switch status",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/plugs": {
             "get": {
                 "summary": "Get plug device list",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/plug/{name}": {
             "get": {
                 "summary": "Get plug device",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/plug/{name}/on": {
             "get": {
                 "summary": "Turn plug device on",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/plug/{name}/off": {
             "get": {
                 "summary": "Turn plug device off",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/hvacs": {
             "get": {
                 "summary": "Get list of HVAC devices",
                 "description": "",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "TODO",
+                        "content": "application/json"
+                    }
+                }
             }
         },
         "/waterheaters": {
