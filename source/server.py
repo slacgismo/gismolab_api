@@ -539,6 +539,7 @@ def spec():
 swag = swagger(_app)
 swag['info']['version'] = "1.0"
 swag['info']['title'] = "GISMoLab API"
+swag['servers'] = {"url":f"https://{host}:{port}/"}
 with open(f"{_app.name}-swagger.json","w") as fh:
     json.dump(swag,fh,indent=4)
 
