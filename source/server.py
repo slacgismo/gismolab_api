@@ -88,15 +88,15 @@ E_CONFLICT = 409
 E_GONE = 410
 
 def _failed(code,message=None,**kwargs):
-    data = kwargs.copy()
-    if message:
-        data['message'] = message
-    else:
-        data['message'] = f"HTTP code {code}"
-    return jsonify(dict(
+    if not message:
+        message = f"HTTP code {code}"
+    result = dict(
         status = "ERROR",
-        data = data,
-        )),code
+        message = message if message else f"HTTP code {code}",
+        )
+    if kwargs:
+        result["data"] = kwargs
+    return result,code
 
 def _error(msg,**kwargs):
     return jsonify({"error":str(msg),"data":kwargs})
@@ -535,6 +535,42 @@ device_commands = {
     "test" : {"lock":None,"data":None},
 }
 
+@_app.route("/start/<name>")
+def api_start_name(name):
+    """Start device command handling
+    ---
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: Device name
+    responses:
+      200:
+        description: Confirmation
+        content: application/json
+        schema:
+          type: dict
+      404:
+        description: Device already started
+        content: application/json
+        schema:
+          type: dict
+      405:
+        description: Device already started
+        content: application/json
+        schema:
+          type: dict
+    """
+    if name in device_commands:
+        return _failed(E_NOTFOUND)
+    elif device_commands[name]["lock"]:
+        return _failed(E_NOTALLOWED)
+    else:
+        device_commands[name]["lock"] = threading.Event()
+        return _success()
+
 @_app.route("/stop/<name>")
 def api_stop_name(name):
     """Stop device command handling
@@ -598,6 +634,11 @@ def api_recv_name(name):
         content: application/json
         schema:
           type: dict
+      405:
+        description: Not allowed
+        content: application/json
+        schema:
+          type: dict
       404:
         description: Device not found
         content: application/json
@@ -614,11 +655,11 @@ def api_recv_name(name):
     except Exception as err:
         return _failed(E_BADREQUEST,str(err))
     if not name in device_commands:
-        return failed(E_NOTFOUND)
+        return _failed(E_NOTFOUND,"device not found")
     else:
         command = device_commands[name]
         if not command["lock"]:
-            command["lock"] = threading.Event()
+            return _failed(E_NOTALLOWED,"device not accepting commands")
         if command["lock"].wait(timeout):
             device_commands[name]["lock"]
             response = command["data"]
@@ -626,7 +667,7 @@ def api_recv_name(name):
             command["data"] = None
             return _success(**response)
         else:
-            return _failed(E_TIMEOUT)
+            return _failed(E_TIMEOUT,"device receive timeout")
 
 @_app.route("/send/<name>",methods=["GET","PUT","POST"])
 def api_send_name(name):

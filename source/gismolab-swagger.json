@@ -236,6 +236,46 @@
                 }
             }
         },
+        "/start/{name}": {
+            "get": {
+                "summary": "Start device command handling",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Confirmation",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "404": {
+                        "description": "Device already started",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "405": {
+                        "description": "Device already started",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device name"
+                    }
+                ]
+            }
+        },
         "/stop/{name}": {
             "get": {
                 "summary": "Stop device command handling",
@@ -295,6 +335,13 @@
                             "type": "dict"
                         }
                     },
+                    "405": {
+                        "description": "Not allowed",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
                     "404": {
                         "description": "Device not found",
                         "content": "application/json",
@@ -332,6 +379,16 @@
             }
         },
         "/send/{name}": {
+            "get": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                }
+            },
             "put": {
                 "summary": "Send device command",
                 "description": "",
@@ -343,16 +400,6 @@
                 }
             },
             "post": {
-                "summary": "Send device command",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "Device command",
-                        "content": "application/json"
-                    }
-                }
-            },
-            "get": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {
