@@ -38,6 +38,13 @@ try:
 except:
     device_ipaddr = scan_network()
 
+#
+# Argument processing
+#
+
+def _get_arg(name,astype=str):
+    value = request.args.get(name)
+    return None if value is None else astype(value)
 
 #
 # Caching
@@ -61,8 +68,36 @@ def age_cache():
             del cache[key]
 
 #
-# Error handling
+# Result handling
 #
+
+E_OK = 200
+def _success(**kwargs):
+    return jsonify(dict(
+        status = "OK",
+        data = kwargs,
+        )),E_OK
+
+E_BADREQUEST = 400
+E_UNAUTHORIZED = 401
+E_FORBIDDEN = 403
+E_NOTFOUND = 404
+E_NOTALLOWED = 405
+E_TIMEOUT = 408
+E_CONFLICT = 409
+E_GONE = 410
+
+def _failed(code,message=None,**kwargs):
+    data = kwargs.copy()
+    if message:
+        data['message'] = message
+    else:
+        data['message'] = f"HTTP code {code}"
+    return jsonify(dict(
+        status = "ERROR",
+        data = data,
+        )),code
+
 def _error(msg,**kwargs):
     return jsonify({"error":str(msg),"data":kwargs})
 
@@ -224,7 +259,7 @@ def api_root():
             description: List of available interfaces and devices
             content: application/json
     """
-    return jsonify({"interfaces" : status, "devices" : devices})
+    return _success(interfaces=status,devices=devices)
 
 @_app.route("/stop")
 def api_stop():
@@ -237,9 +272,9 @@ def api_stop():
     """
     try:
         Device.all_stop()
-        return jsonify(dict(status="OK"))
+        return _success()
     except Exception as err:
-        return _error(err)
+        return _error(err,)
 
 @_app.route("/powerflex")
 def api_powerflex():
@@ -496,36 +531,105 @@ def api_waterheaters():
 # Device control
 #
 
-def _get_lock():
-    lock = threading.Event()
-    return lock
-
 device_commands = {
-    "test" : {"lock":_get_lock(),"data":None},
+    "test" : {"lock":None,"data":None},
 }
 
-@_app.route("/receive/<name>")
-def api_receive(name):
-    """Receive device command
+@_app.route("/stop/<name>")
+def api_stop_name(name):
+    """Stop device command handling
     ---
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: Device name
     responses:
-        200:
-            description: Device command
-            content: application/json
+      200:
+        description: Confirmation
+        content: application/json
+        schema:
+          type: dict
+      408:
+        description: Device not found
+        content: application/json
+        schema:
+          type: dict
+      410:
+        description: Device not waiting
+        content: application/json
+        schema:
+          type: dict
     """
     if not name in device_commands:
-        return _error("device not found")
+        return _failed(E_NOTFOUND)
+    elif not device_commands[name]["lock"]:
+        return _failed(E_GONE)
+    else:
+        device_commands[name]["lock"] = None
+        return _success()    
+
+@_app.route("/recv/<name>")
+def api_recv_name(name):
+    """Receive device command
+    ---
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: Device name
+      - in: query
+        name: timeout
+        schema:
+          type: int
+        description: Receive timeout in seconds
+    responses:
+      200:
+        description: Device command
+        content: application/json
+        schema:
+          type: dict
+      400:
+        description: Bad request
+        content: application/json
+        schema:
+          type: dict
+      404:
+        description: Device not found
+        content: application/json
+        schema:
+          type: dict
+      408:
+        description: Receive timeout
+        content: application/json
+        schema:
+          type: dict                
+    """
+    try:
+        timeout = _get_arg("timeout",int)
+    except Exception as err:
+        return _failed(E_BADREQUEST,str(err))
+    if not name in device_commands:
+        return failed(E_NOTFOUND)
     else:
         command = device_commands[name]
-        command["lock"].wait()
-        device_commands[name]["lock"]
-        response = command["data"]
-        command["lock"].clear()
-        command["data"] = None
-        return jsonify(response)
+        if not command["lock"]:
+            command["lock"] = threading.Event()
+        if command["lock"].wait(timeout):
+            device_commands[name]["lock"]
+            response = command["data"]
+            command["lock"].clear()
+            command["data"] = None
+            return _success(**response)
+        else:
+            return _failed(E_TIMEOUT)
 
 @_app.route("/send/<name>",methods=["GET","PUT","POST"])
-def api_send(name):
+def api_send_name(name):
     """Send device command
     ---
     responses:
@@ -536,12 +640,14 @@ def api_send(name):
     if not name in device_commands:
         return _error("device not found")
     else:
-        data = {}
+        command = device_commands[name]
+        if not command["lock"]:
+            return _error("device not active")
+        data = {"timestamp":time.time()}
         for field in fields:
             value = request.args.get(field)
             if value:
                 data[field] = request.args.get(field)
-        command = device_commands[name]
         command["data"] = data
         command["lock"].set()
         return jsonify(dict(status="OK"))

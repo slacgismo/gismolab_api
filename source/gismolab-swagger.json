@@ -236,20 +236,103 @@
                 }
             }
         },
-        "/receive/{name}": {
+        "/stop/{name}": {
+            "get": {
+                "summary": "Stop device command handling",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Confirmation",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "408": {
+                        "description": "Device not found",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "410": {
+                        "description": "Device not waiting",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device name"
+                    }
+                ]
+            }
+        },
+        "/recv/{name}": {
             "get": {
                 "summary": "Receive device command",
                 "description": "",
                 "responses": {
                     "200": {
                         "description": "Device command",
-                        "content": "application/json"
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "404": {
+                        "description": "Device not found",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "408": {
+                        "description": "Receive timeout",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
                     }
-                }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device name"
+                    },
+                    {
+                        "in": "query",
+                        "name": "timeout",
+                        "schema": {
+                            "type": "int"
+                        },
+                        "description": "Receive timeout in seconds"
+                    }
+                ]
             }
         },
         "/send/{name}": {
-            "post": {
+            "put": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {
@@ -259,7 +342,7 @@
                     }
                 }
             },
-            "put": {
+            "post": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {

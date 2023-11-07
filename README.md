@@ -6,6 +6,18 @@
 
 ![System Architecture](/docs/system_architecture.png)
 
+The server is designed to run either inside or outside the network hosting the
+devices. When running outside the network, the server must receiving incoming
+device status updates and requests.
+
+# General Commands
+
+
+
+## 
+
+# Device Specific Interfaces
+
 ## Powerflex Setup
 
 Create the file `~/.powerflex/powerflex_access.py` and add the following:
@@ -24,7 +36,7 @@ token='0123456789abcdef'
 serial='01234'
 ~~~
 
-## Server Start
+# Server Start
 
 Run the following:
 

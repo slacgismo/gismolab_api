@@ -8,5 +8,6 @@ aiohttp
 netifaces
 plotly
 flask-swagger
+flask-request-arg
 marshmallow
 pyopenssl
