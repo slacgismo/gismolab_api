@@ -269,8 +269,15 @@
                         "content": "application/json",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/schemas/Response"
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error message"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response status"
+                                }
                             }
                         }
                     },
@@ -279,8 +286,15 @@
                         "content": "application/json",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/schemas/Response"
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error message"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response status"
+                                }
                             }
                         }
                     }
@@ -419,7 +433,7 @@
             }
         },
         "/device/{device_id}/send": {
-            "post": {
+            "put": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {
@@ -458,7 +472,7 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {

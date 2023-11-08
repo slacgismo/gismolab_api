@@ -579,15 +579,25 @@ def api_start_deviceid(device_id):
         content: application/json
         schema:
           type: object
-          additionalProperties:
-            $ref: '#/schemas/Response'
+          properties:
+            message:
+              type: string
+              description: Error message
+            status:
+              type: string
+              description: Response status
       405:
         description: Device is busy
         content: application/json
         schema:
           type: object
-          additionalProperties:
-            $ref: '#/schemas/Response'
+          properties:
+            message:
+              type: string
+              description: Error message
+            status:
+              type: string
+              description: Response status
     """
 
     # device must be listed in available device data dictionary
