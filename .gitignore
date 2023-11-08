@@ -2,4 +2,3 @@
 *.log
 *[-.]venv/
 __pycache__
-source/device_key.py

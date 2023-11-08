@@ -213,7 +213,7 @@
             }
         },
         "/device/{device_id}/send": {
-            "put": {
+            "post": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {
@@ -291,7 +291,7 @@
                     }
                 ]
             },
-            "post": {
+            "put": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {

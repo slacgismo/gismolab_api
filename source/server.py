@@ -39,15 +39,31 @@ try:
 except:
     device_ipaddr = scan_network()
 
-try:
-    from device_key import device_key
-except:
-    device_key = None
-if not device_key:
-    device_key = hex(random.randint(0,1e64-1))[2:]
-    with open("device_key.py","w") as fh:
-        print(f"device_key = '{device_key}'",file=fh)
-    print(f"device_key = {device_key}",file=sys.stderr)
+#
+# Keys and token
+#
+def _get_guid():
+    return hex(random.randint(0,1e64-1))[2:]
+
+device_keys = {}
+
+def _load_device_keys():
+    global device_keys
+    try:
+        from device_keys import device_keys
+    except:
+        if not device_keys:
+            device_keys[_get_guid()] = "New facility"
+        _save_device_keys()
+    print("Facility device keys:",file=sys.stderr)
+    for key,facility in device_keys.items():
+        print(f"  {facility:20s}: {key}",file=sys.stderr)
+
+def _save_device_keys():
+    with open("device_keys.py","w") as fh:
+        print(f"device_keys = {device_keys}",file=fh)
+
+_load_device_keys()
 
 #
 # Argument processing
@@ -113,140 +129,140 @@ def _failed(code,message,**kwargs):
 def _error(msg,**kwargs):
     return jsonify({"error":str(msg),"data":kwargs})
 
-#
-# Status
-#
-status = {
-    "powerflex" : {},
-    "sonnen" : {},
-    "egauge" : {},
-    "shelly" : {},
-}
-devices = {
-    "plug" : {},
-    "evcharger" : {},
-    "meter" : {},
-    "battery" : {},
-    "hvac" : {},
-    "waterheater" : {},
-}
-for key in status:
-    status[key] = {
-        "status" : "UNKNOWN", 
-        "last_update" : None,
-    }
+# #
+# # Status
+# #
+# status = {
+#     "powerflex" : {},
+#     "sonnen" : {},
+#     "egauge" : {},
+#     "shelly" : {},
+# }
+# devices = {
+#     "plug" : {},
+#     "evcharger" : {},
+#     "meter" : {},
+#     "battery" : {},
+#     "hvac" : {},
+#     "waterheater" : {},
+# }
+# for key in status:
+#     status[key] = {
+#         "status" : "UNKNOWN", 
+#         "last_update" : None,
+#     }
     
-#
-# Powerflex interface
-#
+# #
+# # Powerflex interface
+# #
 
-try:
-    pf_token = pf.perform_login(pf.URLS["SLAC"]["LOGIN"], pf.username, pf.password)
-    pf_auth_headers = pf.set_authentication_headers(pf_token)
-except Exception as err:
-    pf_token = None
-    pf_auth_headers = None
-    print(f"ERROR [server]: {err}",file=sys.stderr)
+# try:
+#     pf_token = pf.perform_login(pf.URLS["SLAC"]["LOGIN"], pf.username, pf.password)
+#     pf_auth_headers = pf.set_authentication_headers(pf_token)
+# except Exception as err:
+#     pf_token = None
+#     pf_auth_headers = None
+#     print(f"ERROR [server]: {err}",file=sys.stderr)
 
-def _powerflex_update(curr_time=None,duration=None):
+# def _powerflex_update(curr_time=None,duration=None):
 
-    if not curr_time:
-        curr_time = int(time.time())
+#     if not curr_time:
+#         curr_time = int(time.time())
     
-    if not duration:
-        duration = 60
+#     if not duration:
+#         duration = 60
     
-    key = f"powerflex/{curr_time}/{duration}"
-    try:
-        result = get_cache(key)
-    except KeyError:
-        try:
+#     key = f"powerflex/{curr_time}/{duration}"
+#     try:
+#         result = get_cache(key)
+#     except KeyError:
+#         try:
 
-            data = pf.process_interval_data(pf_auth_headers, [curr_time-duration, curr_time])[0]
-            status["powerflex"]["status"] = "OK"
-            status["powerflex"]["last_update"] = int(time.time())
+#             data = pf.process_interval_data(pf_auth_headers, [curr_time-duration, curr_time])[0]
+#             status["powerflex"]["status"] = "OK"
+#             status["powerflex"]["last_update"] = int(time.time())
         
-        except Exception as err:
+#         except Exception as err:
         
-            status["powerflex"]["status"] = "ERROR"
-            return _error(err,context="powerflex")
+#             status["powerflex"]["status"] = "ERROR"
+#             return _error(err,context="powerflex")
 
-        data["time"] = [dt.datetime.fromtimestamp(int(x)).strftime("%Y-%m-%d %H:%M:%S %Z") for x in data["time"]]
-        result = data.set_index(["acc_id","acs_id","time"]).sort_index()
-        set_cache(key,result)
+#         data["time"] = [dt.datetime.fromtimestamp(int(x)).strftime("%Y-%m-%d %H:%M:%S %Z") for x in data["time"]]
+#         result = data.set_index(["acc_id","acs_id","time"]).sort_index()
+#         set_cache(key,result)
 
-    return result
+#     return result
 
-#
-# Sonnen Interface
-#
-sb = sb.SonnenInterface()
+# #
+# # Sonnen Interface
+# #
+# sb = sb.SonnenInterface()
 
-def _sonnen_update():
-    curr_time = int(time.time())
-    key = f"/sonnen"
-    try:
-        result = get_cache(key)
-    except KeyError:
-        try:
-            result = sb.get_status()
-            status["sonnen"]["status"] = "OK"
-            status["sonnen"]["last_update"] = int(time.time())
-        except:
-            status["sonnen"]["status"] = "ERROR"
-            return _error(err,context="sonnen")
-        set_cache(key,result)
+# def _sonnen_update():
+#     curr_time = int(time.time())
+#     key = f"/sonnen"
+#     try:
+#         result = get_cache(key)
+#     except KeyError:
+#         try:
+#             result = sb.get_status()
+#             status["sonnen"]["status"] = "OK"
+#             status["sonnen"]["last_update"] = int(time.time())
+#         except:
+#             status["sonnen"]["status"] = "ERROR"
+#             return _error(err,context="sonnen")
+#         set_cache(key,result)
     
-    return result
+#     return result
 
-#
-# Egauge Interface
-#
-eg = eg.EgaugeInterface()
+# #
+# # Egauge Interface
+# #
+# eg = eg.EgaugeInterface()
 
-def _egauge_update():
-    curr_time = int(time.time())
-    key = f"/egauge"
-    try:
-        result = get_cache(key)
-    except KeyError:
-        try:
-            result = eg.processing_egauge_data()
-            status["egauge"]["status"] = "OK"
-            status["egauge"]["last_update"] = int(time.time())
-        except:
-            status["egauge"]["status"] = "ERROR"
-            return _error(err,context="egauge")
-        set_cache(key,result)
+# def _egauge_update():
+#     curr_time = int(time.time())
+#     key = f"/egauge"
+#     try:
+#         result = get_cache(key)
+#     except KeyError:
+#         try:
+#             result = eg.processing_egauge_data()
+#             status["egauge"]["status"] = "OK"
+#             status["egauge"]["last_update"] = int(time.time())
+#         except:
+#             status["egauge"]["status"] = "ERROR"
+#             return _error(err,context="egauge")
+#         set_cache(key,result)
     
-    return result    
+#     return result    
 
-#
-# Shelly Interface
-#
+# #
+# # Shelly Interface
+# #
 
-def _shelly_update():
-    try:
-        data = sp.get_data()
-    except Exception as err:
-        data = dict(error=str(err))
-    if "error" in data:
-        return dict(status="ERROR",message=data["error"])
-    else:
-        result = {}
-        for name,values in data.items():
-            result[name] = Data(status="OK",
-                last_update = time.time(),
-                energy = values['status']['aenergy']['total'],
-                power = values['status']['apower'],
-                current = values['status']['current'],
-                voltage = values['status']['voltage'],
-                current_control = values['config']['current_limit'] if values['status']['output'] else 0.0,
-                voltage_control = values['config']['voltage_limit'] if values['status']['output'] else 0.0,
-                power_control = values['config']['power_limit'] if values['status']['output'] else 0.0,
-                device_state = "ON" if values['status']['output'] else "OFF",
-                )
-        return result
+# def _shelly_update():
+#     try:
+#         data = sp.get_data()
+#     except Exception as err:
+#         data = dict(error=str(err))
+#     if "error" in data:
+#         return dict(status="ERROR",message=data["error"])
+#     else:
+#         result = {}
+#         for name,values in data.items():
+#             result[name] = Data(status="OK",
+#                 last_update = time.time(),
+#                 energy = values['status']['aenergy']['total'],
+#                 power = values['status']['apower'],
+#                 current = values['status']['current'],
+#                 voltage = values['status']['voltage'],
+#                 current_control = values['config']['current_limit'] if values['status']['output'] else 0.0,
+#                 voltage_control = values['config']['voltage_limit'] if values['status']['output'] else 0.0,
+#                 power_control = values['config']['power_limit'] if values['status']['output'] else 0.0,
+#                 device_state = "ON" if values['status']['output'] else "OFF",
+#                 )
+#         return result
 
 #
 # API Endpoints
@@ -544,17 +560,19 @@ def _after_request(response: Response) -> Response:
 #
 
 device_data = {
-    "test" : {"lock":None,"data":None,"token":None},
+    # "test" : {"lock":None,"data":None,"token":None},
 }
 
 @_app.route("/device/<device_id>/add",methods=["GET","PUT","POST"])
 def api_device_add(device_id):
     """TODO"""
-    key = _get_art("key")
-    if token != device_key:
+    key = _get_arg("key")
+    if not key in device_keys:
         return _failed(E_UNAUTHORIZED,"access denied")
-    device_data[device_id] = {"lock":None,"data":None,"token":None}
-    return _failed(E_BADREQUEST)
+    token = _get_guid()
+    device_data[device_id] = {"lock":None,"data":None,"token":token}
+    print(f"New device token for {device_keys[key]}: {token}",file=sys.stderr)
+    return _success(token=token)
 
 @_app.route("/device/<device_id>/start",methods=["GET"])
 def api_start_deviceid(device_id):
@@ -741,7 +759,7 @@ def api_recv_deviceid(device_id):
         return _failed(E_BADREQUEST,str(err))
     if not device_id in device_data:
         return _failed(E_NOTFOUND,"device not found")
-    elif token != device_key:
+    elif token != device_keys:
         return _failed(E_NOTALLOWED,"access denied")
     else:
         command = device_data[device_id]

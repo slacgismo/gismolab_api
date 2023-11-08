@@ -12,29 +12,26 @@ device status updates and requests.
 
 # General Commands
 
+## Device Control
+
+### Device Enrollment
+
+Devices in the GISMo Lab must register with the internal server to permit user
+access.  This is done using the
+`GET /device/<device_id>/start?token=device_key` API endpoint, where
+`device_id` is the device identifier, and `device_key` is the current device
+key.  A single device key is used for all devices in a facility, which is
+stored in `device_keys.py`.
+
+    GET /device/<device-id>/add?key=<device-key>
+
+This request generates a device token to allow devices to access incoming and deliver
+outgoing traffic from the facility.
+
 
 
 ## 
 
-# Device Specific Interfaces
-
-## Powerflex Setup
-
-Create the file `~/.powerflex/powerflex_access.py` and add the following:
-
-~~~
-username = 'user@example.org'
-password = 'password123'
-~~~
-
-## Sonnen Setup
-
-Create the file` ~/.sonnen/sonnen_access.py` and add the following:
-
-~~~
-token='0123456789abcdef'
-serial='01234'
-~~~
 
 # Server Start
 
