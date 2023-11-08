@@ -246,8 +246,21 @@
                         "content": "application/json",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/schemas/Response"
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "User access token"
+                                        }
+                                    },
+                                    "description": "Data payload"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response status"
+                                }
                             }
                         }
                     },
@@ -445,7 +458,7 @@
                     }
                 ]
             },
-            "get": {
+            "put": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {
@@ -484,7 +497,7 @@
                     }
                 ]
             },
-            "put": {
+            "get": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {

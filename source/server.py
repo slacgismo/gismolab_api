@@ -40,14 +40,14 @@ except:
     device_ipaddr = scan_network()
 
 try:
-    from device_token import device_token
+    from device_key import device_key
 except:
-    device_token = None
-if not device_token:
-    device_token = hex(random.randint(0,1e64-1))[2:]
-    with open("device_token.py","w") as fh:
-        print(f"device_token = '{device_token}'",file=fh)
-    print(f"device_token = {device_token}",file=sys.stderr)
+    device_key = None
+if not device_key:
+    device_key = hex(random.randint(0,1e64-1))[2:]
+    with open("device_key.py","w") as fh:
+        print(f"device_key = '{device_key}'",file=fh)
+    print(f"device_key = {device_key}",file=sys.stderr)
 
 #
 # Argument processing
@@ -563,8 +563,17 @@ def api_start_deviceid(device_id):
         content: application/json
         schema:
           type: object
-          additionalProperties:
-            $ref: '#/schemas/Response'
+          properties:
+            data:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: User access token
+              description: Data payload
+            status:
+              type: string
+              description: Response status
       404:
         description: Device not found
         content: application/json
@@ -705,7 +714,7 @@ def api_recv_deviceid(device_id):
         return _failed(E_BADREQUEST,str(err))
     if not device_id in device_data:
         return _failed(E_NOTFOUND,"device not found")
-    elif token != device_token:
+    elif token != device_key:
         return _failed(E_NOTALLOWED,"access denied")
     else:
         command = device_data[device_id]
