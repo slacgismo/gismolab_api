@@ -245,21 +245,30 @@
                         "description": "Confirmation",
                         "content": "application/json",
                         "schema": {
-                            "type": "dict"
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/schemas/Response"
+                            }
                         }
                     },
                     "404": {
-                        "description": "Device already started",
+                        "description": "Device not found",
                         "content": "application/json",
                         "schema": {
-                            "type": "dict"
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/schemas/Response"
+                            }
                         }
                     },
                     "405": {
-                        "description": "Device already started",
+                        "description": "Device is busy",
                         "content": "application/json",
                         "schema": {
-                            "type": "dict"
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/schemas/Response"
+                            }
                         }
                     }
                 },
@@ -312,6 +321,15 @@
                         },
                         "required": true,
                         "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
                     }
                 ]
             }
@@ -369,6 +387,15 @@
                     },
                     {
                         "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
                         "name": "timeout",
                         "schema": {
                             "type": "int"
@@ -379,7 +406,7 @@
             }
         },
         "/device/{device_id}/send": {
-            "put": {
+            "post": {
                 "summary": "Send device command",
                 "description": "",
                 "responses": {
@@ -400,33 +427,12 @@
                     },
                     {
                         "in": "query",
-                        "name": "(varies)",
-                        "required": true,
-                        "schema": {
-                            "type": "dict"
-                        },
-                        "description": "Data to deliver to device"
-                    }
-                ]
-            },
-            "post": {
-                "summary": "Send device command",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "Device command",
-                        "content": "application/json"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "device_id",
+                        "name": "token",
                         "schema": {
                             "type": "string"
                         },
                         "required": true,
-                        "description": "Device identifier"
+                        "description": "Access token"
                     },
                     {
                         "in": "query",
@@ -457,6 +463,54 @@
                         },
                         "required": true,
                         "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
+                        "name": "(varies)",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
+            },
+            "put": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
                     },
                     {
                         "in": "query",

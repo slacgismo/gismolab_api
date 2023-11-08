@@ -9,6 +9,7 @@ if __name__ == "__main__" and os.path.exists("../requirements.txt"):
     assert(os.system("python3 -m pip install pip --upgrade -r ../requirements.txt 1>/dev/null")==RC_OK)
 
 import json
+import random
 import datetime as dt
 import time
 import copy
@@ -37,6 +38,16 @@ try:
     from server_config import *
 except:
     device_ipaddr = scan_network()
+
+try:
+    from device_token import device_token
+except:
+    device_token = None
+if not device_token:
+    device_token = hex(random.randint(0,1e64-1))[2:]
+    with open("device_token.py","w") as fh:
+        print(f"device_token = '{device_token}'",file=fh)
+    print(f"device_token = {device_token}",file=sys.stderr)
 
 #
 # Argument processing
@@ -532,7 +543,7 @@ def api_waterheaters():
 #
 
 device_data = {
-    "test" : {"lock":None,"data":None},
+    "test" : {"lock":None,"data":None,"token":None},
 }
 
 @_app.route("/device/<device_id>/start",methods=["GET"])
@@ -551,25 +562,45 @@ def api_start_deviceid(device_id):
         description: Confirmation
         content: application/json
         schema:
-          type: dict
+          type: object
+          additionalProperties:
+            $ref: '#/schemas/Response'
       404:
-        description: Device already started
+        description: Device not found
         content: application/json
         schema:
-          type: dict
+          type: object
+          additionalProperties:
+            $ref: '#/schemas/Response'
       405:
-        description: Device already started
+        description: Device is busy
         content: application/json
         schema:
-          type: dict
+          type: object
+          additionalProperties:
+            $ref: '#/schemas/Response'
     """
-    if device_id in device_data:
-        return _failed(E_NOTFOUND)
+
+    # device must be listed in available device data dictionary
+    if not device_id in device_data:
+
+        return _failed(E_NOTFOUND,"device not found")
+
+    # device already has a data lock enabled
     elif device_data[device_id]["lock"]:
-        return _failed(E_NOTALLOWED)
+
+        return _failed(E_NOTALLOWED,"device busy")
+
+    # device is available 
     else:
+
+        # create the data lock
         device_data[device_id]["lock"] = threading.Event()
-        return _success()
+
+        # create an access token
+        token = hex(random.randint(0,1e64-1))[2:]
+        device_data[device_id]["token"] = token
+        return _success(token=token)
 
 @_app.route("/device/<device_id>/stop",methods=["GET"])
 def api_stop_deviceid(device_id):
@@ -582,6 +613,12 @@ def api_stop_deviceid(device_id):
           type: string
         required: true
         description: Device identifier
+      - in: query
+        name: token
+        schema:
+          type: string
+        required: true
+        description: Access token
     responses:
       200:
         description: Confirmation
@@ -599,15 +636,20 @@ def api_stop_deviceid(device_id):
         schema:
           type: dict
     """
+    token = _get_arg("token")
     if not device_id in device_data:
-        return _failed(E_NOTFOUND)
+        return _failed(E_NOTFOUND,"device not found")
     elif not device_data[device_id]["lock"]:
-        return _failed(E_GONE)
+        return _failed(E_GONE,"device not active")
+    elif device_data[device_id]["token"] != token:
+        return _failed(E_NOTALLOWED,"access denied")
     else:
         device_data[device_id]["lock"] = None
+        device_data[device_id]["token"] = None
         return _success()    
 
-@_app.route("/device/<device_id>/recv",methods=["GET"])
+# TODO: the device need a different private token
+@_app.route("/device/<device_id>/recv",methods=["GET"]) 
 def api_recv_deviceid(device_id):
     """Receive device command
     ---
@@ -618,6 +660,12 @@ def api_recv_deviceid(device_id):
           type: string
         required: true
         description: Device identifier
+      - in: query
+        name: token
+        schema:
+          type: string
+        required: true
+        description: Access token
       - in: query
         name: timeout
         schema:
@@ -650,12 +698,15 @@ def api_recv_deviceid(device_id):
         schema:
           type: dict                
     """
+    token = _get_arg("token")
     try:
         timeout = _get_arg("timeout",int)
     except Exception as err:
         return _failed(E_BADREQUEST,str(err))
     if not device_id in device_data:
         return _failed(E_NOTFOUND,"device not found")
+    elif token != device_token:
+        return _failed(E_NOTALLOWED,"access denied")
     else:
         command = device_data[device_id]
         if not command["lock"]:
@@ -681,6 +732,12 @@ def api_send_deviceid(device_id):
         required: true
         description: Device identifier
       - in: query
+        name: token
+        schema:
+          type: string
+        required: true
+        description: Access token
+      - in: query
         name: (varies)
         required: true
         schema:
@@ -691,8 +748,11 @@ def api_send_deviceid(device_id):
             description: Device command
             content: application/json
     """
+    token = _get_arg("token")
     if not device_id in device_data:
         return _failed(E_NOTFOUND,"device not found")
+    elif device_data[device_id]["token"] != token:
+        return _failed(E_NOTALLOWED,"access denied")
     else:
         command = device_data[device_id]
         if not command["lock"]:
