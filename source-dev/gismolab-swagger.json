@@ -1,0 +1,170 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "GISMoLab API"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "API Information",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/docs": {
+            "get": {
+                "summary": "API Documentation",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/data": {
+            "get": {
+                "summary": "Get data model",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/stop": {
+            "get": {
+                "summary": "Emergency stop",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/powerflex": {
+            "get": {
+                "summary": "Get powerflex status",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/powerflex/json/{orient}": {
+            "get": {
+                "summary": "Get powerflex historical data",
+                "description": "See pandas.DataFrame.to_json() for valid values of <orient>",
+                "responses": {}
+            }
+        },
+        "/powerflex/csv": {
+            "get": {
+                "summary": "Get powerflex historical data",
+                "description": "See pandas.DataFrame.to_csv() for details",
+                "responses": {}
+            }
+        },
+        "/evchargers": {
+            "get": {
+                "summary": "Get EV charger device list",
+                "description": "Returns a list of available EV charger devices.",
+                "responses": {}
+            }
+        },
+        "/sonnen": {
+            "get": {
+                "summary": "Get Sonnen battery device list",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/batterys": {
+            "get": {
+                "summary": "Get batteries device list",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/egauge": {
+            "get": {
+                "summary": "Get Egauge metering status",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/meters": {
+            "get": {
+                "summary": "Get meter device list",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/shelly": {
+            "get": {
+                "summary": "Get Shelly switch device list",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/shelly/scan": {
+            "get": {
+                "summary": "Get Shelly switch status",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/plugs": {
+            "get": {
+                "summary": "Get plug device list",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/plug/{name}": {
+            "get": {
+                "summary": "Get plug device",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/plug/{name}/on": {
+            "get": {
+                "summary": "Turn plug device on",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/plug/{name}/off": {
+            "get": {
+                "summary": "Turn plug device off",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/hvacs": {
+            "get": {
+                "summary": "Get list of HVAC devices",
+                "description": "",
+                "responses": {}
+            }
+        },
+        "/waterheaters": {
+            "get": {
+                "summary": "Get list of waterheater devices",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Waterheater list",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "list"
+                        }
+                    }
+                }
+            }
+        },
+        "/spec": {
+            "get": {
+                "summary": "Get API Specification",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "API specifications",
+                        "content": "application/json"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {}
+}
