@@ -5,244 +5,13 @@
         "title": "GISMoLab API"
     },
     "paths": {
-        "/": {
-            "get": {
-                "summary": "Get interfaces and device list",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "List of available interfaces and devices",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/stop": {
-            "get": {
-                "summary": "Emergency stop",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/powerflex": {
-            "get": {
-                "summary": "Get powerflex status",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/powerflex/json/{orient}": {
-            "get": {
-                "summary": "Get powerflex historical data",
-                "description": "See pandas.DataFrame.to_json() for valid values of <orient>",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/powerflex/csv": {
-            "get": {
-                "summary": "Get powerflex historical data",
-                "description": "See pandas.DataFrame.to_csv() for details",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/evchargers": {
-            "get": {
-                "summary": "Get EV charger device list",
-                "description": "Returns a list of available EV charger devices.",
-                "responses": {
-                    "200": {
-                        "description": "list of EV charger names",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error"
-                    }
-                }
-            }
-        },
-        "/sonnen": {
-            "get": {
-                "summary": "Get Sonnen battery device list",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/batterys": {
-            "get": {
-                "summary": "Get batteries device list",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/egauge": {
-            "get": {
-                "summary": "Get Egauge metering status",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/meters": {
-            "get": {
-                "summary": "Get meter device list",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/shelly": {
-            "get": {
-                "summary": "Get Shelly switch device list",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/shelly/scan": {
-            "get": {
-                "summary": "Get Shelly switch status",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/plugs": {
-            "get": {
-                "summary": "Get plug device list",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/plug/{name}": {
-            "get": {
-                "summary": "Get plug device",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/plug/{name}/on": {
-            "get": {
-                "summary": "Turn plug device on",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/plug/{name}/off": {
-            "get": {
-                "summary": "Turn plug device off",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/hvacs": {
-            "get": {
-                "summary": "Get list of HVAC devices",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "TODO",
-                        "content": "application/json"
-                    }
-                }
-            }
-        },
-        "/waterheaters": {
-            "get": {
-                "summary": "Get list of waterheater devices",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "Waterheater list",
-                        "content": "application/json",
-                        "schema": {
-                            "type": "list"
-                        }
-                    }
-                }
-            }
-        },
         "/device/{device_id}/start": {
             "get": {
                 "summary": "Start device command handling",
                 "description": "",
                 "responses": {
                     "200": {
-                        "description": "Confirmation",
+                        "description": "Confirmation, token can be used for send/get operations",
                         "content": "application/json",
                         "schema": {
                             "type": "object",
@@ -265,7 +34,7 @@
                         }
                     },
                     "404": {
-                        "description": "Device not found",
+                        "description": "Device not found, device_id is not listed in available device",
                         "content": "application/json",
                         "schema": {
                             "type": "object",
@@ -277,12 +46,16 @@
                                 "status": {
                                     "type": "string",
                                     "description": "Response status"
+                                },
+                                "code": {
+                                    "type": "integer",
+                                    "description": "HTTP error code"
                                 }
                             }
                         }
                     },
                     "405": {
-                        "description": "Device is busy",
+                        "description": "Device is busy, device_id is already being controlled by another user",
                         "content": "application/json",
                         "schema": {
                             "type": "object",
@@ -294,6 +67,10 @@
                                 "status": {
                                     "type": "string",
                                     "description": "Response status"
+                                },
+                                "code": {
+                                    "type": "integer",
+                                    "description": "HTTP error code"
                                 }
                             }
                         }
@@ -323,6 +100,9 @@
                         "schema": {
                             "type": "dict"
                         }
+                    },
+                    "401": {
+                        "description": "Not authorized"
                     },
                     "408": {
                         "description": "Device not found",
@@ -380,8 +160,8 @@
                             "type": "dict"
                         }
                     },
-                    "405": {
-                        "description": "Not allowed",
+                    "401": {
+                        "description": "Not authorized",
                         "content": "application/json",
                         "schema": {
                             "type": "dict"
@@ -463,46 +243,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "(varies)",
-                        "required": true,
-                        "schema": {
-                            "type": "dict"
-                        },
-                        "description": "Data to deliver to device"
-                    }
-                ]
-            },
-            "post": {
-                "summary": "Send device command",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "Device command",
-                        "content": "application/json"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "device_id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": true,
-                        "description": "Device identifier"
-                    },
-                    {
-                        "in": "query",
-                        "name": "token",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": true,
-                        "description": "Access token"
-                    },
-                    {
-                        "in": "query",
-                        "name": "(varies)",
+                        "name": "variable_name",
                         "required": true,
                         "schema": {
                             "type": "dict"
@@ -541,12 +282,87 @@
                     },
                     {
                         "in": "query",
-                        "name": "(varies)",
+                        "name": "variable_name",
                         "required": true,
                         "schema": {
                             "type": "dict"
                         },
                         "description": "Data to deliver to device"
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
+                        "name": "variable_name",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
+            }
+        },
+        "/device/{device_id}/get": {
+            "get": {
+                "summary": "Get device data",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device data",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "required": true
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string",
+                            "required": true,
+                            "description": "Device identifier"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
                     }
                 ]
             }

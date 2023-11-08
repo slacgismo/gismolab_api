@@ -98,12 +98,13 @@ E_TIMEOUT = 408
 E_CONFLICT = 409
 E_GONE = 410
 
-def _failed(code,message=None,**kwargs):
+def _failed(code,message,**kwargs):
     if not message:
         message = f"HTTP code {code}"
     result = dict(
         status = "ERROR",
-        message = message if message else f"HTTP code {code}",
+        code = code,
+        message = message,
         )
     if kwargs:
         result["data"] = kwargs
@@ -261,282 +262,282 @@ def _after_request(response: Response) -> Response:
     return response
 
 
-@_app.route("/")
-def api_root():
-    """Get interfaces and device list
-    ---
-    responses:
-        200:
-            description: List of available interfaces and devices
-            content: application/json
-    """
-    return _success(interfaces=status,devices=devices)
+# @_app.route("/")
+# def api_root():
+#     """Get interfaces and device list
+#     ---
+#     responses:
+#         200:
+#             description: List of available interfaces and devices
+#             content: application/json
+#     """
+#     return _success(interfaces=status,devices=devices)
 
-@_app.route("/stop")
-def api_stop():
-    """Emergency stop
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    try:
-        Device.all_stop()
-        return _success()
-    except Exception as err:
-        return _error(err,)
+# @_app.route("/stop")
+# def api_stop():
+#     """Emergency stop
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     try:
+#         Device.all_stop()
+#         return _success()
+#     except Exception as err:
+#         return _error(err,)
 
-@_app.route("/powerflex")
-def api_powerflex():
-    """Get powerflex status
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify(status["powerflex"])
+# @_app.route("/powerflex")
+# def api_powerflex():
+#     """Get powerflex status
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify(status["powerflex"])
 
-@_app.route("/powerflex/json/<orient>")
-def api_powerflex_json(orient):
-    """Get powerflex historical data
-    See pandas.DataFrame.to_json() for valid values of <orient>
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    try:
-        curr_time = int(request.args.get("time"))
-        assert(curr_time>0)
-    except:
-        curr_time = None
+# @_app.route("/powerflex/json/<orient>")
+# def api_powerflex_json(orient):
+#     """Get powerflex historical data
+#     See pandas.DataFrame.to_json() for valid values of <orient>
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     try:
+#         curr_time = int(request.args.get("time"))
+#         assert(curr_time>0)
+#     except:
+#         curr_time = None
 
-    try:
-        duration = int(request.args.get("duration"))
-        assert(duration>0)
-    except:
-        duration = None
+#     try:
+#         duration = int(request.args.get("duration"))
+#         assert(duration>0)
+#     except:
+#         duration = None
 
-    try:
+#     try:
 
-        return _powerflex_update(curr_time,duration).to_json(orient=orient)
+#         return _powerflex_update(curr_time,duration).to_json(orient=orient)
 
-    except Exception as err:
+#     except Exception as err:
 
-        return _error(err,context="powerflex")
+#         return _error(err,context="powerflex")
 
-@_app.route("/powerflex/csv")
-def api_powerflex_csv():
-    """Get powerflex historical data
-    See pandas.DataFrame.to_csv() for details
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    try:
-        curr_time = int(request.args.get("time"))
-        assert(curr_time>0)
-    except:
-        curr_time = None
+# @_app.route("/powerflex/csv")
+# def api_powerflex_csv():
+#     """Get powerflex historical data
+#     See pandas.DataFrame.to_csv() for details
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     try:
+#         curr_time = int(request.args.get("time"))
+#         assert(curr_time>0)
+#     except:
+#         curr_time = None
 
-    try:
-        duration = int(request.args.get("duration"))
-        assert(duration>0)
-    except:
-        duration = None
+#     try:
+#         duration = int(request.args.get("duration"))
+#         assert(duration>0)
+#     except:
+#         duration = None
 
-    try:
+#     try:
 
-        return _powerflex_update(curr_time,duration).to_csv(index=True,header=True)
+#         return _powerflex_update(curr_time,duration).to_csv(index=True,header=True)
 
-    except Exception as err:
+#     except Exception as err:
 
-        return _error(err,context="powerflex")
+#         return _error(err,context="powerflex")
 
-@_app.route("/evchargers",methods=["GET"])
-def api_evchargers():
-    """Get EV charger device list
-    Returns a list of available EV charger devices.
-    ---
-    responses:
-        '200':
-            description: list of EV charger names
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: string
-        default:
-            description: Unexpected error
-    """
-    return jsonify([])
+# @_app.route("/evchargers",methods=["GET"])
+# def api_evchargers():
+#     """Get EV charger device list
+#     Returns a list of available EV charger devices.
+#     ---
+#     responses:
+#         '200':
+#             description: list of EV charger names
+#             content:
+#                 application/json:
+#                     schema:
+#                         type: array
+#                         items:
+#                             type: string
+#         default:
+#             description: Unexpected error
+#     """
+#     return jsonify([])
 
-@_app.route("/sonnen")
-def api_sonnen():
-    """Get Sonnen battery device list
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify(_sonnen_update())
+# @_app.route("/sonnen")
+# def api_sonnen():
+#     """Get Sonnen battery device list
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify(_sonnen_update())
 
-@_app.route("/batterys")
-def api_batterys(): # apologys to the English language police but API conventions demand this plural form
-    """Get batteries device list
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify([])
+# @_app.route("/batterys")
+# def api_batterys(): # apologys to the English language police but API conventions demand this plural form
+#     """Get batteries device list
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify([])
     
-@_app.route("/egauge")
-def api_egauge():
-    """Get Egauge metering status
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify(_egauge_update())
+# @_app.route("/egauge")
+# def api_egauge():
+#     """Get Egauge metering status
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify(_egauge_update())
 
-@_app.route("/meters")
-def api_meters():
-    """Get meter device list
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify([])
+# @_app.route("/meters")
+# def api_meters():
+#     """Get meter device list
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify([])
     
-@_app.route("/shelly")
-def api_shelly():
-    """Get Shelly switch device list
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify(sp.get_data())
+# @_app.route("/shelly")
+# def api_shelly():
+#     """Get Shelly switch device list
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify(sp.get_data())
 
-@_app.route("/shelly/scan")
-def api_shelly_scan():
-    """Get Shelly switch status
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    try:
-        network = request.args.get("network").split(',')
-    except:
-        network = None
-    try:
-        sp.verbose_enable = True
-        if not devices["plug"]:
-            devices["plug"] = sp.scan_network(network)
-        return jsonify(devices["plug"])
-    except Exception as err:
-        return _error(err)
+# @_app.route("/shelly/scan")
+# def api_shelly_scan():
+#     """Get Shelly switch status
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     try:
+#         network = request.args.get("network").split(',')
+#     except:
+#         network = None
+#     try:
+#         sp.verbose_enable = True
+#         if not devices["plug"]:
+#             devices["plug"] = sp.scan_network(network)
+#         return jsonify(devices["plug"])
+#     except Exception as err:
+#         return _error(err)
 
-@_app.route("/plugs")
-def api_plugs():
-    """Get plug device list
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    result = sp.get_data()
-    if "error" in result:
-        return jsonify(result)
-    else:
-        devices["plug"] = list(result.keys())
-    return jsonify(devices["plug"])
+# @_app.route("/plugs")
+# def api_plugs():
+#     """Get plug device list
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     result = sp.get_data()
+#     if "error" in result:
+#         return jsonify(result)
+#     else:
+#         devices["plug"] = list(result.keys())
+#     return jsonify(devices["plug"])
 
-@_app.route("/plug/<name>")
-def api_plug_name(name):
-    """Get plug device
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    data = _shelly_update()[name]
-    fmt = request.args.get("format")
-    valid = [x for x in dir(data) if x.startswith("as_") and callable(getattr(data,x))]
-    if not fmt:
-        fmt = "json"
-    elif not f"as_{fmt}" in valid:
-        return _error(f"'format={fmt}' is not valid")
-    if fmt == "html":
-        return str(data.as_html(caption=name.replace('_',' ').title()+"<hr/>")) + '\n'
-    else:
-        return str(getattr(data,f"as_{fmt}")()) + '\n'
+# @_app.route("/plug/<name>")
+# def api_plug_name(name):
+#     """Get plug device
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     data = _shelly_update()[name]
+#     fmt = request.args.get("format")
+#     valid = [x for x in dir(data) if x.startswith("as_") and callable(getattr(data,x))]
+#     if not fmt:
+#         fmt = "json"
+#     elif not f"as_{fmt}" in valid:
+#         return _error(f"'format={fmt}' is not valid")
+#     if fmt == "html":
+#         return str(data.as_html(caption=name.replace('_',' ').title()+"<hr/>")) + '\n'
+#     else:
+#         return str(getattr(data,f"as_{fmt}")()) + '\n'
 
-@_app.route("/plug/<name>/on")
-def api_plug_name_on(name):
-    """Turn plug device on
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """    
-    old = sp.set_switch(name,True)
-    return jsonify(old)
+# @_app.route("/plug/<name>/on")
+# def api_plug_name_on(name):
+#     """Turn plug device on
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """    
+#     old = sp.set_switch(name,True)
+#     return jsonify(old)
 
-@_app.route("/plug/<name>/off")
-def api_plug_name_off(name):
-    """Turn plug device off
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    old = sp.set_switch(name,False)
-    return jsonify(old)
+# @_app.route("/plug/<name>/off")
+# def api_plug_name_off(name):
+#     """Turn plug device off
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     old = sp.set_switch(name,False)
+#     return jsonify(old)
 
-@_app.route("/hvacs")
-def api_hvacs():
-    """Get list of HVAC devices
-    ---
-    responses:
-        200:
-            description: TODO
-            content: application/json
-    """
-    return jsonify([])
+# @_app.route("/hvacs")
+# def api_hvacs():
+#     """Get list of HVAC devices
+#     ---
+#     responses:
+#         200:
+#             description: TODO
+#             content: application/json
+#     """
+#     return jsonify([])
     
-@_app.route("/waterheaters",methods=["GET"])
-def api_waterheaters():
-    """Get list of waterheater devices
-    ---
-    responses:
-        200:
-            description: Waterheater list
-            content: application/json
-            schema:
-                type: list
-    """
-    return jsonify([])    
+# @_app.route("/waterheaters",methods=["GET"])
+# def api_waterheaters():
+#     """Get list of waterheater devices
+#     ---
+#     responses:
+#         200:
+#             description: Waterheater list
+#             content: application/json
+#             schema:
+#                 type: list
+#     """
+#     return jsonify([])    
 
 #
 # Device control
@@ -545,6 +546,15 @@ def api_waterheaters():
 device_data = {
     "test" : {"lock":None,"data":None,"token":None},
 }
+
+@_app.route("/device/<device_id>/add",methods=["GET","PUT","POST"])
+def api_device_add(device_id):
+    """TODO"""
+    key = _get_art("key")
+    if token != device_key:
+        return _failed(E_UNAUTHORIZED,"access denied")
+    device_data[device_id] = {"lock":None,"data":None,"token":None}
+    return _failed(E_BADREQUEST)
 
 @_app.route("/device/<device_id>/start",methods=["GET"])
 def api_start_deviceid(device_id):
@@ -559,7 +569,7 @@ def api_start_deviceid(device_id):
         description: Device identifier
     responses:
       200:
-        description: Confirmation
+        description: Confirmation, token can be used for send/get operations
         content: application/json
         schema:
           type: object
@@ -575,7 +585,7 @@ def api_start_deviceid(device_id):
               type: string
               description: Response status
       404:
-        description: Device not found
+        description: Device not found, device_id is not listed in available device
         content: application/json
         schema:
           type: object
@@ -586,8 +596,11 @@ def api_start_deviceid(device_id):
             status:
               type: string
               description: Response status
+            code:
+              type: integer
+              description: HTTP error code
       405:
-        description: Device is busy
+        description: Device is busy, device_id is already being controlled by another user
         content: application/json
         schema:
           type: object
@@ -598,6 +611,9 @@ def api_start_deviceid(device_id):
             status:
               type: string
               description: Response status
+            code:
+              type: integer
+              description: HTTP error code
     """
 
     # device must be listed in available device data dictionary
@@ -644,6 +660,8 @@ def api_stop_deviceid(device_id):
         content: application/json
         schema:
           type: dict
+      401:
+        description: Not authorized
       408:
         description: Device not found
         content: application/json
@@ -661,13 +679,12 @@ def api_stop_deviceid(device_id):
     elif not device_data[device_id]["lock"]:
         return _failed(E_GONE,"device not active")
     elif device_data[device_id]["token"] != token:
-        return _failed(E_NOTALLOWED,"access denied")
+        return _failed(E_UNAUTHORIZED,"access denied")
     else:
         device_data[device_id]["lock"] = None
         device_data[device_id]["token"] = None
         return _success()    
 
-# TODO: the device need a different private token
 @_app.route("/device/<device_id>/recv",methods=["GET"]) 
 def api_recv_deviceid(device_id):
     """Receive device command
@@ -701,8 +718,8 @@ def api_recv_deviceid(device_id):
         content: application/json
         schema:
           type: dict
-      405:
-        description: Not allowed
+      401:
+        description: Not authorized
         content: application/json
         schema:
           type: dict
@@ -757,21 +774,21 @@ def api_send_deviceid(device_id):
         required: true
         description: Access token
       - in: query
-        name: (varies)
+        name: variable_name
         required: true
         schema:
           type: dict
         description: Data to deliver to device
     responses:
-        200:
-            description: Device command
-            content: application/json
+      200:
+        description: Device command
+        content: application/json
     """
     token = _get_arg("token")
     if not device_id in device_data:
         return _failed(E_NOTFOUND,"device not found")
     elif device_data[device_id]["token"] != token:
-        return _failed(E_NOTALLOWED,"access denied")
+        return _failed(E_UNAUTHORIZED,"access denied")
     else:
         command = device_data[device_id]
         if not command["lock"]:
@@ -784,6 +801,33 @@ def api_send_deviceid(device_id):
         command["data"] = data
         command["lock"].set()
         return _success()
+
+@_app.route("/device/<device_id>/get",methods=["GET"])
+def api_get_deviceid(device_id):
+    """Get device data
+    ---
+    parameters:
+      - in: path
+        name: device_id
+        schema:
+          type: string
+          required: true
+          description: Device identifier
+      - in: query
+        name: token
+        schema:
+          type: string
+        required: true
+        description: Access token
+    responses:
+      200:
+        description: Device data
+        content: application/json
+        schema:
+          type: object
+        required: true
+    """     
+    return _failed(E_BADREQUEST,"not supported")
 
 #
 # Swagger API Spec
