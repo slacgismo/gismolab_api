@@ -236,7 +236,7 @@
                 }
             }
         },
-        "/start/{name}": {
+        "/device/{device_id}/start": {
             "get": {
                 "summary": "Start device command handling",
                 "description": "",
@@ -266,17 +266,17 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "name",
+                        "name": "device_id",
                         "schema": {
                             "type": "string"
                         },
                         "required": true,
-                        "description": "Device name"
+                        "description": "Device identifier"
                     }
                 ]
             }
         },
-        "/stop/{name}": {
+        "/device/{device_id}/stop": {
             "get": {
                 "summary": "Stop device command handling",
                 "description": "",
@@ -306,17 +306,17 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "name",
+                        "name": "device_id",
                         "schema": {
                             "type": "string"
                         },
                         "required": true,
-                        "description": "Device name"
+                        "description": "Device identifier"
                     }
                 ]
             }
         },
-        "/recv/{name}": {
+        "/device/{device_id}/recv": {
             "get": {
                 "summary": "Receive device command",
                 "description": "",
@@ -360,12 +360,12 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "name",
+                        "name": "device_id",
                         "schema": {
                             "type": "string"
                         },
                         "required": true,
-                        "description": "Device name"
+                        "description": "Device identifier"
                     },
                     {
                         "in": "query",
@@ -378,17 +378,7 @@
                 ]
             }
         },
-        "/send/{name}": {
-            "get": {
-                "summary": "Send device command",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "Device command",
-                        "content": "application/json"
-                    }
-                }
-            },
+        "/device/{device_id}/send": {
             "put": {
                 "summary": "Send device command",
                 "description": "",
@@ -397,7 +387,27 @@
                         "description": "Device command",
                         "content": "application/json"
                     }
-                }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "(varies)",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
             },
             "post": {
                 "summary": "Send device command",
@@ -407,7 +417,57 @@
                         "description": "Device command",
                         "content": "application/json"
                     }
-                }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "(varies)",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
+            },
+            "get": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "(varies)",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
             }
         },
         "/spec": {
@@ -425,6 +485,6 @@
     },
     "definitions": {},
     "servers": {
-        "url": "https://127.0.0.1:5000/"
+        "url": "https://0.0.0.0:5001/"
     }
 }

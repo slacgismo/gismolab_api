@@ -531,21 +531,21 @@ def api_waterheaters():
 # Device control
 #
 
-device_commands = {
+device_data = {
     "test" : {"lock":None,"data":None},
 }
 
-@_app.route("/start/<name>")
-def api_start_name(name):
+@_app.route("/device/<device_id>/start",methods=["GET"])
+def api_start_deviceid(device_id):
     """Start device command handling
     ---
     parameters:
       - in: path
-        name: name
+        name: device_id
         schema:
           type: string
         required: true
-        description: Device name
+        description: Device identifier
     responses:
       200:
         description: Confirmation
@@ -563,25 +563,25 @@ def api_start_name(name):
         schema:
           type: dict
     """
-    if name in device_commands:
+    if device_id in device_data:
         return _failed(E_NOTFOUND)
-    elif device_commands[name]["lock"]:
+    elif device_data[device_id]["lock"]:
         return _failed(E_NOTALLOWED)
     else:
-        device_commands[name]["lock"] = threading.Event()
+        device_data[device_id]["lock"] = threading.Event()
         return _success()
 
-@_app.route("/stop/<name>")
-def api_stop_name(name):
+@_app.route("/device/<device_id>/stop",methods=["GET"])
+def api_stop_deviceid(device_id):
     """Stop device command handling
     ---
     parameters:
       - in: path
-        name: name
+        name: device_id
         schema:
           type: string
         required: true
-        description: Device name
+        description: Device identifier
     responses:
       200:
         description: Confirmation
@@ -599,25 +599,25 @@ def api_stop_name(name):
         schema:
           type: dict
     """
-    if not name in device_commands:
+    if not device_id in device_data:
         return _failed(E_NOTFOUND)
-    elif not device_commands[name]["lock"]:
+    elif not device_data[device_id]["lock"]:
         return _failed(E_GONE)
     else:
-        device_commands[name]["lock"] = None
+        device_data[device_id]["lock"] = None
         return _success()    
 
-@_app.route("/recv/<name>")
-def api_recv_name(name):
+@_app.route("/device/<device_id>/recv",methods=["GET"])
+def api_recv_deviceid(device_id):
     """Receive device command
     ---
     parameters:
       - in: path
-        name: name
+        name: device_id
         schema:
           type: string
         required: true
-        description: Device name
+        description: Device identifier
       - in: query
         name: timeout
         schema:
@@ -654,14 +654,14 @@ def api_recv_name(name):
         timeout = _get_arg("timeout",int)
     except Exception as err:
         return _failed(E_BADREQUEST,str(err))
-    if not name in device_commands:
+    if not device_id in device_data:
         return _failed(E_NOTFOUND,"device not found")
     else:
-        command = device_commands[name]
+        command = device_data[device_id]
         if not command["lock"]:
-            return _failed(E_NOTALLOWED,"device not accepting commands")
+            return _failed(E_NOTALLOWED,"device not accepting data")
         if command["lock"].wait(timeout):
-            device_commands[name]["lock"]
+            device_data[device_id]["lock"]
             response = command["data"]
             command["lock"].clear()
             command["data"] = None
@@ -669,21 +669,34 @@ def api_recv_name(name):
         else:
             return _failed(E_TIMEOUT,"device receive timeout")
 
-@_app.route("/send/<name>",methods=["GET","PUT","POST"])
-def api_send_name(name):
+@_app.route("/device/<device_id>/send",methods=["GET","PUT","POST"])
+def api_send_deviceid(device_id):
     """Send device command
     ---
+    parameters:
+      - in: path
+        name: device_id
+        schema:
+          type: string
+        required: true
+        description: Device identifier
+      - in: query
+        name: (varies)
+        required: true
+        schema:
+          type: dict
+        description: Data to deliver to device
     responses:
         200:
             description: Device command
             content: application/json
     """
-    if not name in device_commands:
-        return _error("device not found")
+    if not device_id in device_data:
+        return _failed(E_NOTFOUND,"device not found")
     else:
-        command = device_commands[name]
+        command = device_data[device_id]
         if not command["lock"]:
-            return _error("device not active")
+            return _failed(E_NOTALLOWED,"device not accepting data")
         data = {"timestamp":time.time()}
         for field in fields:
             value = request.args.get(field)
@@ -691,7 +704,7 @@ def api_send_name(name):
                 data[field] = request.args.get(field)
         command["data"] = data
         command["lock"].set()
-        return jsonify(dict(status="OK"))
+        return _success()
 
 #
 # Swagger API Spec
@@ -699,7 +712,7 @@ def api_send_name(name):
 
 from flask_swagger import swagger
 
-@_app.route("/spec")
+@_app.route("/spec",methods=["GET"])
 def spec():
     """Get API Specification
     ---
@@ -708,7 +721,7 @@ def spec():
             description: API specifications
             content: application/json
     """
-    return jsonify(swag)
+    return _success(swag)
 
 swag = swagger(_app)
 swag['info']['version'] = "1.0"
