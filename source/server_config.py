@@ -18,3 +18,6 @@ ssl_context = None # 'adhoc' # None for HTTP only
 
 # Enable CORS
 enable_cors = True # Use True to enforce CORS check
+
+# Auto-upgrade
+auto_upgrade = False # Use True to automatically upgrade modules

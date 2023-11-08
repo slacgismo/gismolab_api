@@ -366,22 +366,10 @@
                     }
                 ]
             }
-        },
-        "/spec": {
-            "get": {
-                "summary": "Get API Specification",
-                "description": "",
-                "responses": {
-                    "200": {
-                        "description": "API specifications",
-                        "content": "application/json"
-                    }
-                }
-            }
         }
     },
     "definitions": {},
     "servers": {
-        "url": "https://0.0.0.0:5001/"
+        "url": "https://127.0.0.1:5000/"
     }
 }
