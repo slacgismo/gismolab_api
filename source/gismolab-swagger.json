@@ -1,0 +1,375 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "GISMoLab API"
+    },
+    "paths": {
+        "/device/{device_id}/start": {
+            "get": {
+                "summary": "Start device command handling",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Confirmation, token can be used for send/get operations",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "User access token"
+                                        }
+                                    },
+                                    "description": "Data payload"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response status"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Device not found, device_id is not listed in available device",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error message"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response status"
+                                },
+                                "code": {
+                                    "type": "integer",
+                                    "description": "HTTP error code"
+                                }
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Device is busy, device_id is already being controlled by another user",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error message"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response status"
+                                },
+                                "code": {
+                                    "type": "integer",
+                                    "description": "HTTP error code"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    }
+                ]
+            }
+        },
+        "/device/{device_id}/stop": {
+            "get": {
+                "summary": "Stop device command handling",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Confirmation",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized"
+                    },
+                    "408": {
+                        "description": "Device not found",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "410": {
+                        "description": "Device not waiting",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    }
+                ]
+            }
+        },
+        "/device/{device_id}/recv": {
+            "get": {
+                "summary": "Receive device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "404": {
+                        "description": "Device not found",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    },
+                    "408": {
+                        "description": "Receive timeout",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "dict"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
+                        "name": "timeout",
+                        "schema": {
+                            "type": "int"
+                        },
+                        "description": "Receive timeout in seconds"
+                    }
+                ]
+            }
+        },
+        "/device/{device_id}/send": {
+            "post": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
+                        "name": "variable_name",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
+            },
+            "get": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
+                        "name": "variable_name",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
+            },
+            "put": {
+                "summary": "Send device command",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device command",
+                        "content": "application/json"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Device identifier"
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    },
+                    {
+                        "in": "query",
+                        "name": "variable_name",
+                        "required": true,
+                        "schema": {
+                            "type": "dict"
+                        },
+                        "description": "Data to deliver to device"
+                    }
+                ]
+            }
+        },
+        "/device/{device_id}/get": {
+            "get": {
+                "summary": "Get device data",
+                "description": "",
+                "responses": {
+                    "200": {
+                        "description": "Device data",
+                        "content": "application/json",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "required": true
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "device_id",
+                        "schema": {
+                            "type": "string",
+                            "required": true,
+                            "description": "Device identifier"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Access token"
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {},
+    "servers": {
+        "url": "https://127.0.0.1:5000/"
+    }
+}
