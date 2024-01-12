@@ -183,7 +183,7 @@ class Collector:
                     if wait_time > 0:
                         time.sleep(wait_time)
                     else:
-                        self.warning(f"update rate of {self.freq} seconds is too high for {self.freq-wait_time} seconds used by poll and archive process")
+                        self.warning(f"update rate of {self.freq:.1f} seconds is too high for {self.freq-wait_time:.1f} seconds used by poll and archive process")
                 except:
                     pass
             self.debug("updater stopped")
